@@ -120,13 +120,16 @@ else {
 
 setInterval(() => {
     try {
-        axios.get(`https://oxy.st/d/${GenerateString(choice([3, 4, 5, 6, 7]))}`, { headers: { UserAgent: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38" } }).then((res) => {
+        axios.get(`https://oxy.st/d/${GenerateString(choice([2, 3, 4, 5, 6, 7]))}`, { headers: { UserAgent: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38" } }).then((res) => {
             const url = String(res.data).split("\n").filter(x => x.match(/<div data-template="[A-Za-z0-9]+-t" data-source_name="[^"]*" data-source_url="[^"]*" class="[^"]*">/));
             if (url.length > 0) {
                 const dlUrl = url[0].split("\"")[5];
                 if (typeof(process.argv[2]) != "undefined" && process.argv[2] == "--unsort") {
-                    fs.writeFileSync(`./${another}`, `${fs.readFileSync(`./${another}`)}\n${dlUrl}`);
-                    console.log(`[INFO] New Link: ${dlUrl}`)
+                    const file = fs.readFileSync(`./${another}`).toString();
+                    if (!file.split("\n").find(x => x === dlUrl)) {
+                        fs.writeFileSync(`./${another}`, `${file}\n${dlUrl}`);
+                        console.log(`[INFO] New Link: ${dlUrl}`)
+                    }
                 }
                 else SortUrl(dlUrl);
             }
