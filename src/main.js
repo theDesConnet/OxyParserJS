@@ -2,6 +2,8 @@
 const axios = require('axios').default;
 const fs = require('fs');
 
+const timeout = 100;
+
 console.clear();
 
 const art = ['   ____             ____                                   _______',
@@ -44,63 +46,50 @@ function choice(array) {
 };
 
 let another;
+let validLinkArray = [];
 
 function SortUrl(dlUrl) {
     switch (true) {
         case [".mp4", ".mov", ".png", ".jpg", ".jpeg", ".mp3", ".mkv"].some(x => dlUrl.toLowerCase().endsWith(x)):
             const mediaFile = fs.readFileSync(`./${another}/Media.txt`).toString();
-            if (!mediaFile.split("\n").find(x => x === dlUrl)) {
-                fs.writeFileSync(`./${another}/Media.txt`, `${mediaFile}\n${dlUrl}`);
-                console.log(`[INFO] Media: ${dlUrl}`);
-            }
+            fs.writeFileSync(`./${another}/Media.txt`, `${mediaFile}\n${dlUrl}`);
+            console.log(`[INFO] Media: ${dlUrl}`);
             break;
 
         case [".txt", ".doc", ".docx", ".xls", ".pdf"].some(x => dlUrl.toLowerCase().endsWith(x)):
             const documentFile = fs.readFileSync(`./${another}/Documents.txt`).toString();
-            if (!documentFile.split("\n").find(x => x === dlUrl)) {
-                fs.writeFileSync(`./${another}/Documents.txt`, `${documentFile}\n${dlUrl}`);
-                console.log(`[INFO] Document: ${dlUrl}`);
-            }
+            fs.writeFileSync(`./${another}/Documents.txt`, `${documentFile}\n${dlUrl}`);
+            console.log(`[INFO] Document: ${dlUrl}`);
             break;
 
         case [".zip", ".rar", ".7z"].some(x => dlUrl.toLowerCase().endsWith(x)):
             const archiveFile = fs.readFileSync(`./${another}/Archives.txt`).toString();
-            if (!archiveFile.split("\n").find(x => x === dlUrl)) {
-                fs.writeFileSync(`./${another}/Archives.txt`, `${archiveFile}\n${dlUrl}`);
-                console.log(`[INFO] Archive: ${dlUrl}`);
-            }
+            fs.writeFileSync(`./${another}/Archives.txt`, `${archiveFile}\n${dlUrl}`);
+            console.log(`[INFO] Archive: ${dlUrl}`);
             break;
 
         case [".exe", ".ps1", ".cmd", ".apk", ".jar"].some(x => dlUrl.toLowerCase().endsWith(x)):
             const executableFile = fs.readFileSync(`./${another}/Executable.txt`).toString();
-            if (!executableFile.split("\n").find(x => x === dlUrl)) {
-                fs.writeFileSync(`./${another}/Executable.txt`, `${executableFile}\n${dlUrl}`);
-                console.log(`[INFO] Executable: ${dlUrl}`);
-            }
+            fs.writeFileSync(`./${another}/Executable.txt`, `${executableFile}\n${dlUrl}`);
+            console.log(`[INFO] Executable: ${dlUrl}`);
             break;
 
         case [".cs", ".js", ".lua", ".cpp", ".c", ".py", ".json"].some(x => dlUrl.toLowerCase().endsWith(x)):
             const sourceFile = fs.readFileSync(`./${another}/Sources.txt`).toString();
-            if (!sourceFile.split("\n").find(x => x === dlUrl)) {
-                fs.writeFileSync(`./${another}/Sources.txt`, `${sourceFile}\n${dlUrl}`);
-                console.log(`[INFO] Source: ${dlUrl}`);
-            }
+            fs.writeFileSync(`./${another}/Sources.txt`, `${sourceFile}\n${dlUrl}`);
+            console.log(`[INFO] Source: ${dlUrl}`);
             break;
 
         case dlUrl.toLowerCase().endsWith(".torrent"):
             const torrentFile = fs.readFileSync(`./${another}/Torrents.txt`).toString();
-            if (!torrentFile.split("\n").find(x => x === dlUrl)) {
-                fs.writeFileSync(`./${another}/Torrents.txt`, `${torrentFile}\n${dlUrl}`);
-                console.log(`[INFO] Torrent: ${dlUrl}`);
-            }
+            fs.writeFileSync(`./${another}/Torrents.txt`, `${torrentFile}\n${dlUrl}`);
+            console.log(`[INFO] Torrent: ${dlUrl}`);
             break;
 
         default:
             const otherFile = fs.readFileSync(`./${another}/Other.txt`).toString();
-            if (!otherFile.split("\n").find(x => x === dlUrl)) {
-                fs.writeFileSync(`./${another}/Other.txt`, `${otherFile}\n${dlUrl}`);
-                console.log(`[INFO] Other: ${dlUrl}`);
-            }
+            fs.writeFileSync(`./${another}/Other.txt`, `${otherFile}\n${dlUrl}`);
+            console.log(`[INFO] Other: ${dlUrl}`);
             break;
     }
 }
@@ -120,7 +109,10 @@ else {
 
 setInterval(() => {
     try {
-        axios.get(`https://oxy.st/d/${GenerateString(choice([2, 3, 4, 5, 6, 7]))}`, { headers: { UserAgent: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38" } }).then((res) => {
+        const genStr = GenerateString(choice([2, 3, 4, 5, 6, 7]));
+        if (validLinkArray.find(x => x === genStr)) return;
+
+        axios.get(`https://oxy.st/d/${genStr})}`, { headers: { UserAgent: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38" } }).then((res) => {
             const url = String(res.data).split("\n").filter(x => x.match(/<div data-template="[A-Za-z0-9]+-t" data-source_name="[^"]*" data-source_url="[^"]*" class="[^"]*">/));
             if (url.length > 0) {
                 const dlUrl = url[0].split("\"")[5];
@@ -132,8 +124,9 @@ setInterval(() => {
                     }
                 }
                 else SortUrl(dlUrl);
+                validLinkArray.push(genStr);
             }
-        }).catch(() => { })
+        }).catch((err) => { console.log(err)})
     } catch { };
-}, 100);
+}, timeout);
 
