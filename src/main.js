@@ -110,7 +110,7 @@ else {
 setInterval(() => {
     try {
         const genStr = GenerateString(choice([2, 3, 4, 5, 6, 7]));
-        if (validLinkArray.find(x => x === genStr)) return;
+        if (validLinkArray.find(x => x.toLowerCase() === genStr.toLowerCase())) return;
 
         axios.get(`https://oxy.st/d/${genStr})}`, { headers: { UserAgent: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Vivaldi/5.5.2805.38" } }).then((res) => {
             const url = String(res.data).split("\n").filter(x => x.match(/<div data-template="[A-Za-z0-9]+-t" data-source_name="[^"]*" data-source_url="[^"]*" class="[^"]*">/));
